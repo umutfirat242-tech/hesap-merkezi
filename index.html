@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Hesap Merkezi | 30 Ücretsiz Online Araç</title>
+<meta name="description" content="Hesaplama, finans, eğitim, hava durumu, spor, QR, PDF, resim, metin ve yapay zeka araçları.">
+<style>
+*{box-sizing:border-box}
+:root{
+ --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#697386;
+ --border:#e5e7eb;--primary:#4f46e5;--soft:#eef2ff;
+}
+.dark{--bg:#10131a;--card:#181c25;--text:#f5f7fb;--muted:#a5adbd;--border:#2b3140;--soft:#252a45}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;transition:.2s}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--border)}
+nav{max-width:1200px;margin:auto;padding:15px 20px;display:flex;align-items:center;gap:20px}
+.logo{font-size:23px;font-weight:800;white-space:nowrap}
+.search{flex:1;padding:12px 16px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text)}
+button{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700}
+.primary{background:var(--primary);color:white}
+.secondary{background:var(--soft);color:var(--text)}
+.icon{font-size:20px;background:transparent}
+main{max-width:1200px;margin:auto;padding:30px 20px}
+.hero{text-align:center;padding:55px 15px}
+.hero h1{font-size:48px;margin:0 0 15px}
+.hero p{font-size:19px;color:var(--muted)}
+.hero-search{max-width:700px;margin:25px auto;display:flex;gap:8px}
+.hero-search input{flex:1;padding:17px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);font-size:16px}
+.assistant{margin-top:15px}
+h2{margin-top:35px}
+.category{margin:30px 0}
+.category-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);padding:20px;border-radius:16px;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 25px #00000012}
+.card .emoji{font-size:30px}
+.card h3{margin:10px 0 6px}
+.card p{color:var(--muted);font-size:14px;margin:0}
+.tool{display:none;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:25px;margin-top:25px}
+.tool.active{display:block}
+.field{margin:10px 0}
+label{display:block;font-weight:700;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+textarea{min-height:160px}
+.result{margin-top:15px;padding:16px;background:var(--soft);border-radius:12px;line-height:1.7}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chat{height:350px;overflow:auto;border:1px solid var(--border);border-radius:15px;padding:15px;margin:15px 0}
+.msg{padding:11px;margin:8px 0;border-radius:12px;max-width:80%}
+.user{background:var(--soft);margin-left:auto}
+.bot{background:var(--bg)}
+footer{text-align:center;padding:50px;color:var(--muted)}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse}
+td,th{padding:9px;border-bottom:1px solid var(--border);text-align:left}
+@media(max-width:650px){
+ nav{flex-wrap:wrap}.search{order:3;flex-basis:100%}
+ .hero h1{font-size:34px}.row{grid-template-columns:1fr}
+ .grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+<div class="logo">🧮 Hesap Merkezi</div>
+<input class="search" id="search" placeholder="Araç ara...">
+<button class="icon" onclick="toggleTheme()">🌙</button>
+<button class="icon" onclick="openTool('voice')">🎙️</button>
+</nav>
+</header>
+
+<main>
+
+<section class="hero">
+<h1>İhtiyacın olan her şey tek yerde.</h1>
+<p>Hesapla, dönüştür, planla ve günlük işlerini kolayca hallet.</p>
+
+<div class="hero-search">
+<input id="smartSearch" placeholder="Ne yapmak istiyorsun? Örn: 200'ün %15'i">
+<button class="primary" onclick="smartSearch()">Ara</button>
+</div>
+
+<button class="primary assistant" onclick="openTool('voice')">
+🎙️ Sesli Asistanı Aç
+</button>
+</section>
+
+<div id="categories"></div>
+
+<!-- 1 YÜZDE -->
+<section class="tool" id="percent">
+<h2>🧮 Yüzde Hesaplama</h2>
+<div class="row">
+<div><label>Sayı</label><input id="percentNum" type="number"></div>
+<div><label>Yüzde</label><input id="percentRate" type="number"></div>
+</div>
+<button class="primary" onclick="percentCalc()">Hesapla</button>
+<div class="result" id="percentResult"></div>
+</section>
+
+<!-- 2 YAŞ -->
+<section class="tool" id="age">
+<h2>🎂 Yaş Hesaplama</h2>
+<label>Doğum tarihi</label>
+<input id="birthDate" type="date">
+<button class="primary" onclick="ageCalc()">Hesapla</button>
+<div class="result" id="ageResult"></div>
+</section>
+
+<!-- 3 TARİH -->
+<section class="tool" id="date">
+<h2>📅 Tarih Hesaplama</h2>
+<div class="row">
+<div><label>Başlangıç</label><input id="date1" type="date"></div>
+<div><label>Bitiş</label><input id="date2" type="date"></div>
+</div>
+<button class="primary" onclick="dateCalc()">Hesapla</button>
+<div class="result" id="dateResult"></div>
+</section>
+
+<!-- 4 MATEMATİK -->
+<section class="tool" id="math">
+<h2>🔢 Matematik Hesaplama</h2>
+<input id="mathInput" placeholder="Örn: (25+5)*2">
+<button class="primary" onclick="mathCalc()">Hesapla</button>
+<div class="result" id="mathResult"></div>
+</section>
+
+<!-- 5 BİRİM -->
+<section class="tool" id="unit">
+<h2>📏 Birim Dönüştürücü</h2>
+<input id="unitValue" type="number">
+<div class="row">
+<select id="unitFrom">
+<option value="m">Metre</option><option value="km">Kilometre</option>
+<option value="cm">Santimetre</option><option value="mm">Milimetre</option>
+<option value="kg">Kilogram</option><option value="g">Gram</option>
+<option value="l">Litre</option><option value="ml">Mililitre</option>
+</select>
+<select id="unitTo">
+<option value="m">Metre</option><option value="km">Kilometre</option>
+<option value="cm">Santimetre</option><option value="mm">Milimetre</option>
+<option value="kg">Kilogram</option><option value="g">Gram</option>
+<option value="l">Litre</option><option value="ml">Mililitre</option>
+</select>
+</div>
+<button class="primary" onclick="unitCalc()">Dönüştür</button>
+<div class="result" id="unitResult"></div>
+</section>
+
+<!-- 6 MAAŞ -->
+<section class="tool" id="salary">
+<h2>💰 Maaş Hesaplama</h2>
+<input id="salaryGross" type="number" placeholder="Brüt maaş">
+<p>Bu araçta güncel yasal kesinti oranlarını doğrulamadan otomatik kesinti uygulanmaz.</p>
+<button class="primary" onclick="salaryCalc()">Hesapla</button>
+<div class="result" id="salaryResult"></div>
+</section>
+
+<!-- 7 KREDİ -->
+<section class="tool" id="credit">
+<h2>💳 Kredi Hesaplama</h2>
+<div class="row">
+<input id="creditAmount" type="number" placeholder="Kredi tutarı">
+<input id="creditRate" type="number" step="0.01" placeholder="Aylık faiz %">
+</div>
+<input id="creditMonths" type="number" placeholder="Vade (ay)">
+<button class="primary" onclick="creditCalc()">Hesapla</button>
+<div class="result" id="creditResult"></div>
+</section>
+
+<!-- 8 FAİZ -->
+<section class="tool" id="interest">
+<h2>📈 Faiz Hesaplama</h2>
+<div class="row">
+<input id="interestPrincipal" type="number" placeholder="Ana para">
+<input id="interestRate" type="number" placeholder="Yıllık faiz %">
+</div>
+<input id="interestYears" type="number" step="0.1" placeholder="Yıl">
+<button class="primary" onclick="interestCalc()">Hesapla</button>
+<div class="result" id="interestResult"></div>
+</section>
+
+<!-- 9 DÖVİZ -->
+<section class="tool" id="currency">
+<h2>💱 Döviz Hesaplama</h2>
+<p>Canlı kur için gerçek bir API bağlantısı gereklidir. API bağlanmadan sahte kur gösterilmez.</p>
+<div class="row">
+<input id="currencyAmount" type="number" placeholder="Miktar">
+<select><option>TRY</option><option>USD</option><option>EUR</option><option>GBP</option></select>
+</div>
+<div class="result">Canlı döviz API bağlantısı henüz yapılandırılmadı.</div>
+</section>
+
+<!-- 10 ALTIN -->
+<section class="tool" id="gold">
+<h2>🪙 Altın Hesaplama</h2>
+<p>Canlı altın fiyatı için gerçek veri servisi gerekir.</p>
+<div class="result">Altın API bağlantısı henüz yapılandırılmadı.</div>
+</section>
+
+<!-- 11 NOT -->
+<section class="tool" id="grade">
+<h2>🎓 Not Ortalaması</h2>
+<textarea id="grades" placeholder="Notları virgülle yaz: 70,80,90"></textarea>
+<button class="primary" onclick="gradeCalc()">Hesapla</button>
+<div class="result" id="gradeResult"></div>
+</section>
+
+<!-- 12 OBP -->
+<section class="tool" id="obp">
+<h2>🎓 OBP Hesaplama</h2>
+<input id="diploma" type="number" min="0" max="100" placeholder="Diploma notu">
+<button class="primary" onclick="obpCalc()">Hesapla</button>
+<div class="result" id="obpResult"></div>
+</section>
+
+<!-- 13 TYT -->
+<section class="tool" id="tyt">
+<h2>📝 TYT Hesaplama</h2>
+<div class="row">
+<input id="tytTurkce" type="number" placeholder="Türkçe doğru">
+<input id="tytTurkceYan" type="number" placeholder="Türkçe yanlış">
+<input id="tytMat" type="number" placeholder="Matematik doğru">
+<input id="tytMatYan" type="number" placeholder="Matematik yanlış">
+<input id="tytSos" type="number" placeholder="Sosyal doğru">
+<input id="tytSosYan" type="number" placeholder="Sosyal yanlış">
+<input id="tytFen" type="number" placeholder="Fen doğru">
+<input id="tytFenYan" type="number" placeholder="Fen yanlış">
+</div>
+<button class="primary" onclick="tytCalc()">Netleri Hesapla</button>
+<div class="result" id="tytResult"></div>
+</section>
+
+<!-- 14 AYT -->
+<section class="tool" id="ayt">
+<h2>📝 AYT Hesaplama</h2>
+<textarea id="aytInput" placeholder="Ders doğru ve yanlışlarını gir. Örn: Matematik 30 doğru 5 yanlış"></textarea>
+<button class="primary" onclick="genericNet('aytInput','aytResult')">Net Hesaplama</button>
+<div class="result" id="aytResult"></div>
+</section>
+
+<!-- 15 LGS -->
+<section class="tool" id="lgs">
+<h2>🏫 LGS Hesaplama</h2>
+<textarea id="lgsInput" placeholder="Ders doğru ve yanlışlarını gir."></textarea>
+<button class="primary" onclick="genericNet('lgsInput','lgsResult')">Net Hesapla</button>
+<div class="result" id="lgsResult"></div>
+</section>
+
+<!-- 16 HAVA -->
+<section class="tool" id="weather">
+<h2>🌦️ Hava Durumu</h2>
+<input id="city" placeholder="Şehir">
+<button class="primary" onclick="weatherInfo()">Sorgula</button>
+<div class="result" id="weatherResult">
+Gerçek hava durumu API bağlantısı yapılandırılmadı.
+</div>
+</section>
+
+<!-- 17 GERİ SAYIM -->
+<section class="tool" id="countdown">
+<h2>⏰ Geri Sayım</h2>
+<input id="countTarget" type="datetime-local">
+<button class="primary" onclick="startCountdown()">Başlat</button>
+<div class="result" id="countResult"></div>
+</section>
+
+<!-- 18 TAKVİM -->
+<section class="tool" id="calendar">
+<h2>🗓️ Takvim</h2>
+<div id="calendarBox"></div>
+</section>
+
+<!-- 19 TATİLLER -->
+<section class="tool" id="holidays">
+<h2>🇹🇷 Resmî Tatiller</h2>
+<div class="result">
+2026 Türkiye resmî tatilleri için doğrulanmış güncel veri kaynağı bağlantısı gerekir.
+</div>
+</section>
+
+<!-- 20 NAMAZ -->
+<section class="tool" id="prayer">
+<h2>🕌 Namaz Vakitleri</h2>
+<input placeholder="Şehir">
+<div class="result">Gerçek namaz vakti API bağlantısı yapılandırılmadı.</div>
+</section>
+
+<!-- 21 SPOR -->
+<section class="tool" id="sports">
+<h2>⚽ Spor Merkezi</h2>
+<p>Maçlar, fikstür ve puan durumları için canlı spor API'si gerekir.</p>
+<div class="result">Spor API bağlantısı yapılandırılmadı.</div>
+</section>
+
+<!-- 22 GÜNDEM -->
+<section class="tool" id="news">
+<h2>📰 Gündem</h2>
+<p>Güncel haberleri göstermek için gerçek haber API/RSS bağlantısı gerekir.</p>
+<div class="result">Haber API bağlantısı yapılandırılmadı.</div>
+</section>
+
+<!-- 23 HIZ -->
+<section class="tool" id="speed">
+<h2>📡 İnternet Hız Testi</h2>
+<p>Tarayıcı tek başına güvenilir gerçek download/upload testi yapamaz. Gerçek ölçüm servisi gerekir.</p>
+<button class="primary" onclick="speedTest()">Test Et</button>
+<div class="result" id="speedResult"></div>
+</section>
+
+<!-- 24 QR -->
+<section class="tool" id="qr">
+<h2>📱 QR Kod Oluşturucu</h2>
+<input id="qrText" placeholder="Metin veya URL">
+<button class="primary" onclick="makeQR()">QR Oluştur</button>
+<div class="result" id="qrResult"></div>
+</section>
+
+<!-- 25 ŞİFRE -->
+<section class="tool" id="password">
+<h2>🔐 Şifre Oluşturucu</h2>
+<input id="passLength" type="number" min="4" max="100" value="16">
+<button class="primary" onclick="makePassword()">Oluştur</button>
+<button class="secondary" onclick="copyPass()">Kopyala</button>
+<div class="result" id="passwordResult"></div>
+</section>
+
+<!-- 26 PDF -->
+<section class="tool" id="pdf">
+<h2>📄 PDF Araçları</h2>
+<input type="file" accept=".pdf" multiple>
+<div class="result">PDF işlemleri için browser-side PDF kütüphaneleri eklenebilir.</div>
+</section>
+
+<!-- 27 RESİM -->
+<section class="tool" id="image">
+<h2>🖼️ Resim Araçları</h2>
+<input id="imageFile" type="file" accept="image/*">
+<div class="row">
+<input id="imageWidth" type="number" placeholder="Yeni genişlik">
+<input id="imageHeight" type="number" placeholder="Yeni yükseklik">
+</div>
+<button class="primary" onclick="resizeImage()">Boyutlandır</button>
+<div class="result" id="imageResult"></div>
+</section>
+
+<!-- 28 METİN -->
+<section class="tool" id="text">
+<h2>✍️ Metin Araçları</h2>
+<textarea id="textInput" placeholder="Metnini yaz..."></textarea>
+<div class="result">
+Kelime: <span id="words">0</span><br>
+Karakter: <span id="chars">0</span><br>
+Boşluksuz karakter: <span id="nospace">0</span><br>
+Cümle: <span id="sentences">0</span>
+</div>
+<button class="secondary" onclick="upperText()">BÜYÜK HARF</button>
+<button class="secondary" onclick="lowerText()">küçük harf</button>
+</section>
+
+<!-- 29 AI -->
+<section class="tool" id="ai">
+<h2>🤖 AI Asistan</h2>
+<div class="chat" id="chat">
+<div class="msg bot">Merhaba! AI bağlantısı yapılandırıldığında burada seninle sohbet edebilirim.</div>
+</div>
+<div class="row">
+<input id="aiInput" placeholder="Mesajını yaz...">
+<button class="primary" onclick="aiMessage()">Gönder</button>
+</div>
+</section>
+
+<!-- 30 SES -->
+<section class="tool" id="voice">
+<h2>🎙️ Sesli Asistan</h2>
+<div class="chat" id="voiceChat">
+<div class="msg bot">Hazırım. Bana bir hesaplama söyleyebilirsin.</div>
+</div>
+<button class="primary" onclick="startVoice()">🎙️ Dinliyorum</button>
+<button class="secondary" onclick="stopVoice()">Durdur</button>
+</section>
+
+</main>
+
+<footer>
+🧮 Hesap Merkezi<br>
+30 araç tek platformda
+</footer>
+
+<script>
+const tools=[
+["HESAPLAMA","🧮","Yüzde Hesaplama","Yüzde, artış ve azalış hesaplar","percent"],
+["HESAPLAMA","🎂","Yaş Hesaplama","Yaş ve doğum gününe kalan süre","age"],
+["HESAPLAMA","📅","Tarih Hesaplama","İki tarih arasındaki süre","date"],
+["HESAPLAMA","🔢","Matematik Hesaplama","Gelişmiş matematik hesaplama","math"],
+["HESAPLAMA","📏","Birim Dönüştürücü","kg, km, litre ve daha fazlası","unit"],
+["FİNANS","💰","Maaş Hesaplama","Brüt ve net maaş hesaplama","salary"],
+["FİNANS","💳","Kredi Hesaplama","Taksit ve toplam ödeme","credit"],
+["FİNANS","📈","Faiz Hesaplama","Faiz ve toplam getiri","interest"],
+["FİNANS","💱","Döviz Hesaplama","Güncel döviz dönüşümü","currency"],
+["FİNANS","🪙","Altın Hesaplama","Altın fiyat ve dönüşümü","gold"],
+["EĞİTİM","🎓","Not Ortalaması","Ders notlarının ortalaması","grade"],
+["EĞİTİM","🎓","OBP Hesaplama","Diploma notundan OBP","obp"],
+["EĞİTİM","📝","TYT Hesaplama","TYT net hesaplama","tyt"],
+["EĞİTİM","📝","AYT Hesaplama","AYT net hesaplama","ayt"],
+["EĞİTİM","🏫","LGS Hesaplama","LGS net hesaplama","lgs"],
+["GÜNLÜK YAŞAM","🌦️","Hava Durumu","Şehre göre hava durumu","weather"],
+["GÜNLÜK YAŞAM","⏰","Geri Sayım","Tarihe kalan süre","countdown"],
+["GÜNLÜK YAŞAM","🗓️","Takvim","Gün, hafta ve ay","calendar"],
+["GÜNLÜK YAŞAM","🇹🇷","Resmî Tatiller","Türkiye resmî tatilleri","holidays"],
+["GÜNLÜK YAŞAM","🕌","Namaz Vakitleri","Şehre göre namaz vakitleri","prayer"],
+["GÜNDEM & SPOR","⚽","Spor Merkezi","Maçlar ve fikstür","sports"],
+["GÜNDEM & SPOR","📰","Gündem","Günün önemli gelişmeleri","news"],
+["TEKNOLOJİ","📡","İnternet Hız Testi","Download, upload ve ping","speed"],
+["TEKNOLOJİ","📱","QR Kod Oluşturucu","Metin veya URL'den QR","qr"],
+["TEKNOLOJİ","🔐","Şifre Oluşturucu","Güçlü rastgele şifre","password"],
+["DOSYA","📄","PDF Araçları","PDF işlemleri","pdf"],
+["DOSYA","🖼️","Resim Araçları","Resim boyutlandırma","image"],
+["DOSYA","✍️","Metin Araçları","Kelime ve karakter sayacı","text"],
+["YAPAY ZEKA","🤖","AI Asistan","Yapay zeka sohbeti","ai"],
+["YAPAY ZEKA","🎙️","Sesli Asistan","Konuşarak araçları kullan","voice"]
+];
+
+const categoryNames={
+"HESAPLAMA":"🧮 Hesaplama",
+"FİNANS":"💰 Finans",
+"EĞİTİM":"🎓 Eğitim",
+"GÜNLÜK YAŞAM":"🌤️ Günlük Yaşam",
+"GÜNDEM & SPOR":"🏆 Gündem & Spor",
+"TEKNOLOJİ":"💻 Teknoloji",
+"DOSYA":"📄 Dosya & Medya",
+"YAPAY ZEKA":"🤖 Yapay Zeka"
+};
+
+function render(){
+const container=document.getElementById("categories");
+const groups={};
+tools.forEach(t=>{
+ if(!groups[t[0]])groups[t[0]]=[];
+ groups[t[0]].push(t);
+});
+container.innerHTML="";
+Object.keys(groups).forEach(cat=>{
+ const section=document.createElement("section");
+ section.className="category";
+ section.innerHTML=`<div class="category-title"><h2>${categoryNames[cat]}</h2><span>${groups[cat].length} araç</span></div><div class="grid"></div>`;
+ const grid=section.querySelector(".grid");
+ groups[cat].forEach(t=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.dataset.search=(t[2]+" "+t[3]).toLocaleLowerCase("tr-TR");
+  card.innerHTML=`<div class="emoji">${t[1]}</div><h3>${t[2]}</h3><p>${t[3]}</p>`;
+  card.onclick=()=>openTool(t[4]);
+  grid.appendChild(card);
+ });
+ container.appendChild(section);
+});
+}
+render();
+
+function openTool(id){
+ document.querySelectorAll(".tool").forEach(x=>x.classList.remove("active"));
+ const el=document.getElementById(id);
+ if(el){
+  el.classList.add("active");
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  localStorage.setItem("lastTool",id);
+ }
+}
+
+function toggleTheme(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true")document.body.classList.add("dark");
+
+function percentCalc(){
+ let n=+percentNum.value,p=+percentRate.value;
+ percentResult.textContent=Number.isFinite(n)&&Number.isFinite(p)?`${n} sayısının %${p} değeri = ${n*p/100}`:"Geçerli değer gir.";
+}
+
+function ageCalc(){
+ const d=new Date(birthDate.value);
+ if(isNaN(d)){ageResult.textContent="Doğum tarihi seç.";return}
+ const now=new Date();
+ let y=now.getFullYear()-d.getFullYear();
+ let m=now.getMonth()-d.getMonth();
+ if(m<0||(m===0&&now.getDate()<d.getDate()))y--;
+ ageResult.textContent=`Yaş: ${y} yıl`;
+}
+
+function dateCalc(){
+ const a=new Date(date1.value),b=new Date(date2.value);
+ if(isNaN(a)||isNaN(b)){dateResult.textContent="İki tarih seç.";return}
+ dateResult.textContent=`Aradaki süre: ${Math.abs(Math.round((b-a)/86400000))} gün`;
+}
+
+function mathCalc(){
+ const s=mathInput.value.trim();
+ if(!/^[0-9+\-*/().%\s]+$/.test(s)){mathResult.textContent="Geçersiz ifade.";return}
+ try{mathResult.textContent="Sonuç: "+Function('"use strict";return ('+s+')')()}
+ catch{mathResult.textContent="Hesaplanamadı."}
+}
+
+const factors={m:1,km:1000,cm:.01,mm:.001,kg:1,g:.001,l:1,ml:.001};
+function unitCalc(){
+ const a=unitFrom.value,b=unitTo.value,v=+unitValue.value;
+ const length=["m","km","cm","mm"],weight=["kg","g"],volume=["l","ml"];
+ const same=[length,weight,volume].some(x=>x.includes(a)&&x.includes(b));
+ unitResult.textContent=!same?"Bu birimler birbirine dönüştürülemez.":`${v} ${a} = ${v*factors[a]/factors[b]} ${b}`;
+}
+
+function salaryCalc(){
+ const v=+salaryGross.value;
+ salaryResult.textContent=v>0?`Brüt maaş: ${v.toLocaleString("tr-TR")} TL. Güncel net maaş için ilgili yılın yasal parametreleri gerekir.`:"Brüt maaş gir.";
+}
+
+function creditCalc(){
+ const P=+creditAmount.value,r=+creditRate.value/100,n=+creditMonths.value;
+ if(P<=0||n<=0){creditResult.textContent="Bilgileri doldur.";return}
+ const pay=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+ creditResult.innerHTML=`Aylık taksit: ${pay.toFixed(2)}<br>Toplam ödeme: ${(pay*n).toFixed(2)}<br>Toplam faiz: ${(pay*n-P).toFixed(2)}`;
+}
+
+function interestCalc(){
+ const P=+interestPrincipal.value,r=+interestRate.value/100,t=+interestYears.value;
+ if(P<=0||t<=0){interestResult.textContent="Bilgileri doldur.";return}
+ const total=P*Math.pow(1+r,t);
+ interestResult.innerHTML=`Toplam: ${total.toFixed(2)}<br>Getiri: ${(total-P).toFixed(2)}`;
+}
+
+function gradeCalc(){
+ const a=grades.value.split(",").map(Number).filter(Number.isFinite);
+ gradeResult.textContent=a.length?`Ortalama: ${(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2)}`:"Not gir.";
+}
+
+function obpCalc(){
+ const n=+diploma.value;
+ obpResult.textContent=n>=0&&n<=100?`OBP: ${(n*5).toFixed(2)}`:"0-100 arasında diploma notu gir.";
+}
+
+function net(d,y){return (+d||0)-(+y||0)/4}
+function tytCalc(){
+ const t=net(tytTurkce.value,tytTurkceYan.value);
+ const m=net(tytMat.value,tytMatYan.value);
+ const s=net(tytSos.value,tytSosYan.value);
+ const f=net(tytFen.value,tytFenYan.value);
+ tytResult.innerHTML=`Türkçe: ${t}<br>Matematik: ${m}<br>Sosyal: ${s}<br>Fen: ${f}<br><b>Toplam net: ${t+m+s+f}</b><br><small>Bu sonuç net toplamıdır; resmi puan için güncel ÖSYM katsayıları gerekir.</small>`;
+}
+
+function genericNet(input,out){
+ document.getElementById(out).innerHTML="Girilen bilgiler için doğru-yanlış ayrıştırması yapılacak şekilde API/hesaplama modülü eklenebilir. Tahmini puan resmi sonuç değildir.";
+}
+
+function weatherInfo(){
+ weatherResult.textContent="Gerçek hava durumu API'si bağlanmadan güncel hava verisi gösterilmez.";
+}
+
+let timer;
+function startCountdown(){
+ clearInterval(timer);
+ const target=new Date(countTarget.value).getTime();
+ if(!target){countResult.textContent="Tarih seç.";return}
+ timer=setInterval(()=>{
+  const d=target-Date.now();
+  if(d<=0){clearInterval(timer);countResult.textContent="Süre doldu.";return}
+  const days=Math.floor(d/86400000);
+  const hours=Math.floor(d/3600000)%24;
+  const mins=Math.floor(d/60000)%60;
+  const secs=Math.floor(d/1000)%60;
+  countResult.textContent=`${days} gün ${hours} saat ${mins} dakika ${secs} saniye`;
+ },1000);
+}
+
+function drawCalendar(){
+ const d=new Date(),y=d.getFullYear(),m=d.getMonth();
+ let html=`<h3>${d.toLocaleString("tr-TR",{month:"long",year:"numeric"})}</h3><table><tr>`;
+ ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"].forEach(x=>html+=`<th>${x}</th>`);
+ html+="</tr><tr>";
+ let first=(new Date(y,m,1).getDay()+6)%7;
+ for(let i=0;i<first;i++)html+="<td></td>";
+ let days=new Date(y,m+1,0).getDate();
+ for(let i=1;i<=days;i++){
+  html+=`<td>${i}</td>`;
+  if((first+i)%7===0)html+="</tr><tr>";
+ }
+ html+="</tr></table>";
+ calendarBox.innerHTML=html;
+}
+drawCalendar();
+
+function speedTest(){
+ speedResult.textContent="Gerçek download/upload testi için ölçüm sunucusu gerekir. Sahte hız gösterilmiyor.";
+}
+
+function makeQR(){
+ const text=qrText.value.trim();
+ if(!text){qrResult.textContent="Metin veya URL gir.";return}
+ qrResult.innerHTML=`QR oluşturmak için harici QR kütüphanesi/API gerekir.<br>İçerik: ${escapeHtml(text)}`;
+}
+
+function makePassword(){
+ const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+ const len=Math.max(4,Math.min(100,+passLength.value||16));
+ const arr=new Uint32Array(len);
+ crypto.getRandomValues(arr);
+ let s="";
+ for(let i=0;i<len;i++)s+=chars[arr[i]%chars.length];
+ passwordResult.textContent=s;
+}
+
+async function copyPass(){
+ if(!passwordResult.textContent)return;
+ await navigator.clipboard.writeText(passwordResult.textContent);
+ alert("Şifre kopyalandı.");
+}
+
+imageFile.addEventListener("change",()=>{
+ if(imageFile.files[0])imageResult.textContent="Resim seçildi.";
+});
+
+function resizeImage(){
+ const file=imageFile.files[0];
+ const w=+imageWidth.value,h=+imageHeight.value;
+ if(!file||!w||!h){imageResult.textContent="Resim, genişlik ve yükseklik gir.";return}
+ const img=new Image(),url=URL.createObjectURL(file);
+ img.onload=()=>{
+  const c=document.createElement("canvas");
+  c.width=w;c.height=h;
+  c.getContext("2d").drawImage(img,0,0,w,h);
+  c.toBlob(blob=>{
+   const a=document.createElement("a");
+   a.href=URL.createObjectURL(blob);
+   a.download="resim-yeniden-boyutlandirildi.png";
+   a.textContent="⬇️ Resmi indir";
+   imageResult.innerHTML="";
+   imageResult.appendChild(a);
+  });
+ };
+ img.src=url;
+}
+
+textInput.addEventListener("input",()=>{
+ const t=textInput.value;
+ words.textContent=t.trim()?t.trim().split(/\s+/).length:0;
+ chars.textContent=t.length;
+ nospace.textContent=t.replace(/\s/g,"").length;
+ sentences.textContent=(t.match(/[.!?]+/g)||[]).length;
+});
+function upperText(){textInput.value=textInput.value.toLocaleUpperCase("tr-TR");textInput.dispatchEvent(new Event("input"))}
+function lowerText(){textInput.value=textInput.value.toLocaleLowerCase("tr-TR");textInput.dispatchEvent(new Event("input"))}
+
+function aiMessage(){
+ const input=aiInput.value.trim();
+ if(!input)return;
+ const chat=document.getElementById("chat");
+ chat.innerHTML+=`<div class="msg user">${escapeHtml(input)}</div>`;
+ chat.innerHTML+=`<div class="msg bot">AI bağlantısı henüz yapılandırılmadı. Gerçek AI için güvenli bir backend ve API bağlantısı gerekiyor.</div>`;
+ aiInput.value="";
+ chat.scrollTop=chat.scrollHeight;
+}
+
+let recognition=null;
+function startVoice(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){alert("Tarayıcın sesli tanımayı desteklemiyor. Chrome veya Edge kullan.");return}
+ recognition=new SR();
+ recognition.lang="tr-TR";
+ recognition.interimResults=false;
+ recognition.onresult=e=>{
+  const text=e.results[0][0].transcript;
+  addVoice("Sen",text);
+  processVoice(text);
+ };
+ recognition.onerror=()=>addVoice("Asistan","Ses algılanamadı, tekrar deneyebilirsin.");
+ recognition.start();
+ addVoice("Asistan","Dinliyorum...");
+}
+function stopVoice(){if(recognition)recognition.stop()}
+
+function addVoice(who,text){
+ const chat=document.getElementById("voiceChat");
+ chat.innerHTML+=`<div class="msg ${who==="Sen"?"user":"bot"}"><b>${who}:</b> ${escapeHtml(text)}</div>`;
+ chat.scrollTop=chat.scrollHeight;
+}
+
+function speak(text){
+ if("speechSynthesis"in window){
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="tr-TR";
+  speechSynthesis.speak(u);
+ }
+}
+
+function processVoice(text){
+ const t=text.toLocaleLowerCase("tr-TR");
+
+ if(t.includes("yüzde")){
+  const nums=t.match(/\d+(?:[.,]\d+)?/g);
+  if(nums&&nums.length>=2){
+   percentNum.value=nums[0].replace(",",".");
+   percentRate.value=nums[1].replace(",",".");
+   percentCalc();
+   const answer=percentResult.textContent;
+   addVoice("Asistan",answer);
+   speak(answer);
+   openTool("percent");
+   return;
+  }
+ }
+
+ if(t.includes("kilometre")||t.includes("metre")){
+  openTool("unit");
+  const answer="Birim dönüştürücüyü açtım.";
+  addVoice("Asistan",answer);
+  speak(answer);
+  return;
+ }
+
+ if(t.includes("yaşımı")||t.includes("yaş hesapla")){
+  openTool("age");
+  const answer="Yaş hesaplama aracını açtım. Doğum tarihini girerek hesaplayabilirsin.";
+  addVoice("Asistan",answer);
+  speak(answer);
+  return;
+ }
+
+ if(t.includes("qr")){
+  openTool("qr");
+  const answer="QR kod aracını açtım.";
+  addVoice("Asistan",answer);
+  speak(answer);
+  return;
+ }
+
+ if(t.includes("şifre")){
+  openTool("password");
+  const answer="Şifre oluşturucuyu açtım.";
+  addVoice("Asistan",answer);
+  speak(answer);
+  return;
+ }
+
+ const answer="Bunu anladım ama bu komut için henüz gerçek AI bağlantısı yapılandırılmadı.";
+ addVoice("Asistan",answer);
+ speak(answer);
+}
+
+function smartSearch(){
+ const q=smartSearchInput().toLocaleLowerCase("tr-TR");
+ if(!q)return;
+
+ const cards=[...document.querySelectorAll(".card")];
+ const found=cards.find(c=>c.dataset.search.includes(q));
+
+ if(found){found.click();return}
+
+ const nums=q.match(/\d+(?:[.,]\d+)?/g);
+ if(q.includes("yüzde")&&nums&&nums.length>=2){
+  percentNum.value=nums[0].replace(",",".");
+  percentRate.value=nums[1].replace(",",".");
+  percentCalc();
+  openTool("percent");
+  return;
+ }
+
+ alert("Aradığın araç bulunamadı.");
+}
+
+function smartSearchInput(){
+ return document.getElementById("smartSearch").value.trim();
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+ const q=e.target.value.toLocaleLowerCase("tr-TR");
+ document.querySelectorAll(".card").forEach(c=>{
+  c.style.display=c.dataset.search.includes(q)?"block":"none";
+ });
+});
+
+function escapeHtml(s){
+ return String(s).replace(/[&<>"']/g,m=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+ })[m]);
+}
+</script>
+
+</body>
+</html>
